@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: franchise-api
+
+app:
+  dynamodb:
+    table-name: ${DYNAMODB_TABLE:franchises}
+    region: ${AWS_REGION:us-east-1}
+    endpoint: ${DYNAMODB_ENDPOINT:}
+    create-table: ${DYNAMODB_CREATE_TABLE:false}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
