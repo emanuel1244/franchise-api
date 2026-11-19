@@ -1,0 +1,33 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      dynamodb:
+        image: amazon/dynamodb-local:latest
+        ports:
+          - 8000:8000
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Build y pruebas (unitarias + integracion con DynamoDB Local)
+        env:
+          DYNAMODB_IT_ENDPOINT: http://localhost:8000
+        run: mvn -B verify
+      - name: Reporte de cobertura
+        uses: actions/upload-artifact@v4
+        with:
+          name: jacoco-report
+          path: target/site/jacoco
+      - name: Build de la imagen Docker
+        run: docker build -t franchise-api:${{ github.sha }} .
